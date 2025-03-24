@@ -1,13 +1,29 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { mockEpisodes } from '../data/mockEpisodes';
+// import { mockEpisodes } from '../data/mockEpisodes';
 import type { Episode } from '../types/episode';
+import api from '../api';
 
 const episodes = ref<Episode[]>([]);
 
-onMounted(() => {
-  episodes.value = mockEpisodes.sort((a, b) => b.listens - a.listens);
-});
+const fetchEpisodes = async () => {
+  try {
+    const data = await api.getEpisodeTrending();
+    if (Array.isArray(data)) {
+      episodes.value = data.filter(episode => {
+        const language = episode.feedLanguage.toLowerCase();
+        return language.includes('zh') || language.includes('cn');
+    }).sort((a, b) => b.listens - a.listens);
+    } else {
+      console.error('数据格式错误，返回的数据不是数组');
+      episodes.value = [];
+    }
+  } catch (error) {
+    console.error('获取热门单集数据失败:', error);
+    episodes.value = [];
+  }
+};
+onMounted(fetchEpisodes);
 </script>
 
 <template>
@@ -15,14 +31,14 @@ onMounted(() => {
     <h1>Trending Episodes</h1>
     <div class="episodes-list">
       <div v-for="episode in episodes" :key="episode.id" class="episode-card">
-        <img :src="episode.coverImage" :alt="episode.title" class="episode-image">
+        <img :src="episode.feedImage" :alt="episode.title" class="episode-image">
         <div class="episode-info">
           <h3>{{ episode.title }}</h3>
           <p class="podcast-name">{{ episode.podcastName }}</p>
           <p class="description">{{ episode.description }}</p>
           <div class="stats">
             <span>{{ episode.duration }} mins</span>
-            <span>{{ episode.listens.toLocaleString() }} listens</span>
+            <span>{{ episode.listens ? episode.listens.toLocaleString() : '' }} listens</span>
           </div>
         </div>
       </div>

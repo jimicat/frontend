@@ -6,4 +6,8 @@ export interface Episode {
   duration: number;
   listens: number;
   coverImage: string;
+  feedImage: string;
+  feedLanguage: string;
+  enclosureUrl: string;
+  image: string;
 }

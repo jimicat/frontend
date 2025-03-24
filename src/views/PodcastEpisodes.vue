@@ -16,6 +16,8 @@ const currentEpisodeId = ref<number | null>(null); // 当前播放的单集 ID
 const currentTime = ref<number>(0); // 当前播放时间
 const duration = ref<number>(0); // 音频总时长
 const isPlaying = ref<boolean>(false); // 播放状态
+const volume = ref<number>(0.3); // 音量，范围 0 - 1
+const showVolumeSlider = ref<boolean>(true); // 控制音量滑块的显示与隐藏，始终为true
 
 //限制描述长度
 const truncateDescription = (text: string, length: number = 100) => {
@@ -31,6 +33,7 @@ const removeHtmlTags = (html: string) => {
 const togglePlay = (episode: Episode) => {
   if (!audioRef.value) {
     audioRef.value = new Audio();
+    audioRef.value.volume = volume.value; // 在音频初始化时设置音量
   }
 
   if (currentEpisodeId.value === episode.id) {
@@ -44,6 +47,7 @@ const togglePlay = (episode: Episode) => {
     }
   } else {
     // 播放新音频
+    audioRef.value.volume = volume.value; // 在音频初始化时设置音量
     audioRef.value.src = episode.enclosureUrl;
     audioRef.value.play();
     currentEpisodeId.value = episode.id;
@@ -77,6 +81,15 @@ const updateProgress = (event: Event) => {
   }
 };
 
+// 调整音量
+const setVolume = (target: HTMLInputElement | null) => {
+  if (audioRef.value && target) {
+    const value = parseFloat(target.value);
+    audioRef.value.volume = value;
+    volume.value = value;
+  }
+};
+
 onMounted(async () => {
   try {
     const podcasts = await api.getPodcasts();
@@ -89,6 +102,11 @@ onMounted(async () => {
     console.error("Error loading podcasts or episodes:", error);
   }
 });
+
+
+const toggleVolumeSlider = () => {
+  showVolumeSlider.value = !showVolumeSlider.value;
+};
 </script>
 
 
@@ -120,19 +138,31 @@ onMounted(async () => {
             <h3>{{ episode.title }}</h3>
             <p class="description">{{ removeHtmlTags(truncateDescription(podcast.description, 150)) }}</p>
             <div class="stats">
-              <span>{{ (episode.duration)/60 }} mins</span>
+              <span>{{ ((episode.duration)/60).toFixed(2) }} mins</span>
             </div>
             <div class="audio-controls">
               <button @click="togglePlay(episode)">
                 {{ currentEpisodeId === episode.id && isPlaying ? '⏸ Pause' : '▶ Play' }}
               </button>
-              <input
-                v-if="currentEpisodeId === episode.id"
-                type="range"
-                :value="currentTime"
-                :max="duration"
-                @input="updateProgress"
-              />
+              <template v-if="currentEpisodeId === episode.id && isPlaying">
+                <span class="progress-indicator">{{ (currentTime / duration * 100).toFixed(0) }}%</span>
+                <input
+                  type="range"
+                  :value="currentTime"
+                  :max="duration"
+                  @input="updateProgress"
+                />
+                <span class="volume-icon" @click="toggleVolumeSlider">🔈</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  :value="volume"
+                  @input="setVolume($event.target)"
+                  class="volume-slider"
+                />
+              </template>
             </div>
           </div>
         </div>
@@ -266,4 +296,21 @@ input[type="range"]::-webkit-slider-thumb {
   cursor: pointer;
 }
 
+.volume-icon {
+  cursor: pointer;
+  margin-left: 10px;
+}
+.volume-slider {
+  position: relative;
+  bottom: auto;
+  left: auto;
+  transform: none;
+  width: 100px;
+  height: 5px;
+  appearance: slider-horizontal;
+  background: #ddd;
+  border-radius: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
 </style>

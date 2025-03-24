@@ -1,12 +1,3 @@
-// export interface Podcast {
-//   id: number;
-//   title: string;
-//   description: string;
-//   url: string;
-//   episodes: number;
-//   rating: number;
-//   coverImage: string;
-// }
 export interface Podcast {
   id: number;
   title: string;
@@ -20,4 +11,6 @@ export interface Podcast {
   trendScore: number;
   language: string;
   categories: { [key: number]: string }; // 使用数字键来表示分类ID与名称
+  episodes: number;
+  rating: number;
 }

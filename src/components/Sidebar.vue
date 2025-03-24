@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLocalStorage } from '@vueuse/core';
 
 const router = useRouter();
 const isExpanded = useLocalStorage('sidebarExpanded', true); // 默认展开侧边栏
-const searchQuery = ref('');
 const isLoggedIn = useLocalStorage('isLoggedIn', false);
 
 const handleLogin = () => {
@@ -17,37 +15,21 @@ const handleLogin = () => {
   }
 };
 
-const handleSearch = () => {
-  router.push({
-    path: '/search',
-    query: { q: searchQuery.value }
-  });
-  searchQuery.value = '';
-};
 
 </script>
 
 <template>
   <div class="sidebar" :class="{ collapsed: !isExpanded }">
     <div class="sidebar-content">
-      <!-- Search Section -->
-      <div class="search-section">
-        <input 
-          type="text" 
-          v-model="searchQuery"
-          placeholder="搜索..."
-          @keyup.enter="handleSearch"
-        >
-      </div>
       <!-- Navigation Links -->
       <nav class="nav-links">
         <router-link to="/podcast-trending" class="nav-item">
           <span class="icon">📈</span>
-          <span class="text">播客趋势</span>
+          <span class="text">Podcast Trends</span>
         </router-link>
         <router-link to="/episode-trending" class="nav-item">
           <span class="icon">🎧</span>
-          <span class="text">剧集趋势</span>
+          <span class="text">Episode Trends</span>
         </router-link>
       </nav>
       <!-- Login Button -->
@@ -68,7 +50,7 @@ const handleSearch = () => {
   height: 100vh;
   background-color: #333;
   color: white;
-  width: 200px;
+  width: 250px;
   z-index: 1000;
   transition: width 0.3s ease;
 }
@@ -114,17 +96,6 @@ const handleSearch = () => {
   flex-direction: column;
   gap: 20px;
 }
-.search-section input {
-  width: 100%;
-  padding: 8px;
-  border: none;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-}
-.search-section input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
 .nav-links {
   display: flex;
   flex-direction: column;
@@ -169,5 +140,15 @@ const handleSearch = () => {
 }
 .text {
   white-space: nowrap;
+}
+.sidebar.collapsed .text {
+  display: none;
+}
+.sidebar.collapsed .nav-links {
+  align-items: center;
+}
+.sidebar.collapsed .login-btn {
+  justify-content: center;
+  border: none;
 }
 </style>

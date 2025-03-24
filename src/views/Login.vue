@@ -59,8 +59,10 @@ const handleLogin = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 80vh;
+  min-height: 100vh;
   padding: 2rem;
+  /* 添加以下代码确保居中 */
+  margin: 0 auto;
 }
 
 .login-card {

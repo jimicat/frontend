@@ -43,7 +43,6 @@ const toggleSidebar = () => {
 .breadcrumb {
   /* 示例样式 */
   padding: 10px;
-  background-color: #f5f5f5;
   display: flex;
   align-items: center;
   gap: 10px;

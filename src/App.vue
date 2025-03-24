@@ -8,8 +8,10 @@ import Breadcrumb from './components/Breadcrumb.vue';
     <Sidebar />
     <div class="right-content">
       <main class="main-content">
-        <Breadcrumb />
-        <router-view></router-view>
+        <Breadcrumb class="breadcrumb" />
+        <keep-alive>
+          <router-view class="view-container"></router-view>
+        </keep-alive>
       </main>
     </div>
   </div>
@@ -28,10 +30,24 @@ import Breadcrumb from './components/Breadcrumb.vue';
 .main-content {
   margin-left: 250px;
   transition: margin-left 0.3s ease;
+  position: relative;
+}
+
+.view-container {
+  padding-top: 80px !important;
+  height: 100vh;
+  overflow-y: scroll;
 }
 
 .sidebar.collapsed + .right-content .main-content {
   margin-left: 60px;
+}
+
+.breadcrumb {
+ position: absolute; 
+ width: 100%;
+ background-color: #fff;
+ z-index: 1;
 }
 
 body {
