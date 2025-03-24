@@ -7,6 +7,7 @@ import EpisodeTrending from './views/EpisodeTrending.vue'
 import Login from './views/Login.vue'
 import Search from './views/Search.vue'
 import PodcastEpisodes from './views/PodcastEpisodes.vue'
+import Register from './views/Register.vue' // Import the Register component
 
 const router = createRouter({
   history: createWebHistory(),
@@ -26,6 +27,10 @@ const router = createRouter({
     {
       path: '/login',
       component: Login
+    },
+    {
+      path: '/register',
+      component: Register
     },
     {
       path: '/search',

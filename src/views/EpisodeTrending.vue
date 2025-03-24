@@ -12,7 +12,7 @@ const fetchEpisodes = async () => {
     if (Array.isArray(data)) {
       episodes.value = data.filter(episode => {
         const language = episode.feedLanguage.toLowerCase();
-        return language.includes('zh') || language.includes('cn');
+        return language.includes('zh') || language.includes('zh-CN');
     }).sort((a, b) => b.listens - a.listens);
     } else {
       console.error('数据格式错误，返回的数据不是数组');
