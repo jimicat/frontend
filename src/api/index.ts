@@ -2,7 +2,8 @@ import axios from "axios";
 import type { Episode } from "../types/episode";
 import type { Podcast } from "../types/podcast";
 
-const API_BASE_URL = "http://127.0.0.1:8000/api"; // FastAPI 服务器地址
+// const API_BASE_URL = "http://127.0.0.1:8000/api"; // FastAPI 服务器地址
+const API_BASE_URL ="https://podapi.ywnote.com/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,

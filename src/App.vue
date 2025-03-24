@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
 import Sidebar from './components/Sidebar.vue';
+import Breadcrumb from './components/Breadcrumb.vue';
 </script>
 
 <template>
   <div class="app-container">
     <Sidebar />
-    <main class="main-content">
-      <router-view></router-view>
-    </main>
+    <div class="right-content">
+      <main class="main-content">
+        <Breadcrumb />
+        <router-view></router-view>
+      </main>
+    </div>
   </div>
 </template>
 
@@ -18,13 +21,16 @@ import Sidebar from './components/Sidebar.vue';
   min-height: 100vh;
 }
 
-.main-content {
+.right-content {
   flex: 1;
+}
+
+.main-content {
   margin-left: 250px;
   transition: margin-left 0.3s ease;
 }
 
-.sidebar.collapsed + .main-content {
+.sidebar.collapsed + .right-content .main-content {
   margin-left: 60px;
 }
 
