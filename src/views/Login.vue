@@ -26,9 +26,9 @@ const handleLogin = async () => {
         // 将登录状态存储在 localStorage 中
         localStorage.setItem('isLoggedIn', 'true');
         isLoggedIn.value = true;
-        console.log('登录成功，重定向到主页...');
-        // 重定向到主页
-        router.push('/');
+        console.log('登录成功，重定向到用户页面...');
+        // 重定向到用户页面
+        router.push('/user');
       } else {
         // 如果登录失败，显示错误信息
         error.value = response.data.message || '邮箱或密码错误';

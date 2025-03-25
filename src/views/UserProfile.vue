@@ -16,8 +16,8 @@ const handleLogout = () => {
   <div class="user-profile-container">
     <div class="sidebar">
       <nav class="nav-links">
-        <router-link to="/user/subscriptions" class="nav-item">我的订阅</router-link>
-        <router-link to="/user/favorites" class="nav-item">我的收藏</router-link>
+        <router-link to="/user/subscriptions" class="nav-item">订阅</router-link>
+        <router-link to="/user/favorites" class="nav-item">收藏</router-link>
         <router-link to="/user/playlists" class="nav-item">播放列表</router-link>
         <button class="nav-item logout-button" @click="handleLogout">退出登录</button>
       </nav>
@@ -35,8 +35,8 @@ const handleLogout = () => {
 
 .sidebar {
   width: 250px;
-  background: #333;
-  color: white;
+  background: #f5f5f5;
+  color: #333;
   padding: 1rem;
 }
 
@@ -47,7 +47,7 @@ const handleLogout = () => {
 }
 
 .nav-item {
-  color: white;
+  color: #333;
   text-decoration: none;
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -55,13 +55,13 @@ const handleLogout = () => {
 }
 
 .nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .logout-button {
   background: none;
   border: none;
-  color: white;
+  color: #333;
   cursor: pointer;
   text-align: left;
   padding: 0.5rem 1rem;
@@ -70,7 +70,7 @@ const handleLogout = () => {
 }
 
 .logout-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .content {

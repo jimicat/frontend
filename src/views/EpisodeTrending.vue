@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-// import { mockEpisodes } from '../data/mockEpisodes';
 import type { Episode } from '../types/episode';
 import api from '../api';
 
@@ -28,20 +27,26 @@ onMounted(fetchEpisodes);
 
 <template>
   <div class="container">
-    <h1>Trending Episodes</h1>
-    <div class="episodes-list">
-      <div v-for="episode in episodes" :key="episode.id" class="episode-card">
-        <img :src="episode.feedImage" :alt="episode.title" class="episode-image">
-        <div class="episode-info">
+    <h1>我的订阅</h1>
+    <div class="subscriptions">
+      <div v-for="episode in episodes" :key="episode.id" class="subscription-card">
+        <img :src="episode.feedImage" :alt="episode.title" class="subscription-image">
+        <div class="subscription-info">
           <h3>{{ episode.title }}</h3>
           <p class="podcast-name">{{ episode.podcastName }}</p>
-          <p class="description">{{ episode.description }}</p>
-          <div class="stats">
-            <span>{{ episode.duration }} mins</span>
-            <span>{{ episode.listens ? episode.listens.toLocaleString() : '' }} listens</span>
-          </div>
+          <button class="play-button">▶</button>
         </div>
       </div>
+    </div>
+    <h2>最近更新</h2>
+    <div class="recent-updates">
+      <div class="update-header">今日更新</div>
+      <ul>
+        <li v-for="episode in episodes" :key="episode.id">
+          <span>{{ episode.title }}</span>
+          <span>{{ episode.podcastName }}</span>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -51,58 +56,66 @@ onMounted(fetchEpisodes);
   padding: 2rem;
 }
 
-h1 {
-  margin-bottom: 2rem;
+h1, h2 {
+  margin-bottom: 1rem;
   color: #333;
 }
 
-.episodes-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.episode-card {
-  display: flex;
-  gap: 1.5rem;
+.subscriptions, .recent-updates {
   background: white;
   padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
 }
 
-.episode-image {
-  width: 120px;
-  height: 120px;
+.subscriptions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.subscription-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.subscription-image {
+  width: 60px;
+  height: 60px;
   object-fit: cover;
   border-radius: 4px;
 }
 
-.episode-info {
+.subscription-info {
   flex: 1;
-}
-
-h3 {
-  margin: 0 0 0.5rem 0;
-  color: #333;
-}
-
-.podcast-name {
-  color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-}
-
-.description {
-  color: #444;
-  margin-bottom: 1rem;
-  line-height: 1.4;
-}
-
-.stats {
   display: flex;
-  gap: 1rem;
-  color: #666;
-  font-size: 0.9rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.play-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.recent-updates ul {
+  list-style: none;
+  padding: 0;
+}
+
+.recent-updates li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.update-header {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
 }
 </style>
