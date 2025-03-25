@@ -29,6 +29,10 @@ const handleLogin = () => {
           <span class="icon">🎧</span>
           <span class="text">Episode Trends</span>
         </router-link>
+        <router-link to="/user" class="nav-item" v-if="isLoggedIn">
+          <span class="icon">👤</span>
+          <span class="text">个人中心</span>
+        </router-link>
       </nav>
       <!-- Login Button -->
       <button class="login-btn" @click="handleLogin">

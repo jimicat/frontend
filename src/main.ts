@@ -7,7 +7,8 @@ import EpisodeTrending from './views/EpisodeTrending.vue'
 import Login from './views/Login.vue'
 import Search from './views/Search.vue'
 import PodcastEpisodes from './views/PodcastEpisodes.vue'
-import Register from './views/Register.vue' // Import the Register component
+import Register from './views/Register.vue'
+import UserProfile from './views/UserProfile.vue' // Import the UserProfile component
 
 const router = createRouter({
   history: createWebHistory(),
@@ -39,6 +40,24 @@ const router = createRouter({
     {
       path: '/podcasts/:id/episodes/',
       component: PodcastEpisodes
+    },
+    {
+      path: '/user',
+      component: UserProfile,
+      children: [
+        {
+          path: 'subscriptions',
+          component: { template: '<div>我的订阅</div>' }
+        },
+        {
+          path: 'favorites',
+          component: { template: '<div>我的收藏</div>' }
+        },
+        {
+          path: 'playlists',
+          component: { template: '<div>播放列表</div>' }
+        }
+      ]
     }
   ]
 })
