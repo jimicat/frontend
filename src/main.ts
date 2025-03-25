@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import './style.css'
+// import './style.css'
+import './style/index.css'
 import App from './App.vue'
 import PodcastTrending from './views/PodcastTrending.vue'
 import EpisodeTrending from './views/EpisodeTrending.vue'
