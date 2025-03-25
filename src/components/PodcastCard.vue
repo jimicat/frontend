@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Podcast } from '../types/podcast';
 
@@ -18,9 +17,9 @@ const showEpisodes = () => {
     <img :src="podcast.image" :alt="podcast.title" class="podcast-image">
     <div class="podcast-info">
       <h2>{{ podcast.title }}</h2>
-      <!-- <p>{{ podcast.categories }}</p> -->
-      <!-- <p class="host">Hosted by {{ podcast.url }}</p> -->
-      <!-- <p class="description">{{ podcast.description }}</p> -->
+        <!-- <p>{{ podcast.categories }}</p> -->
+        <!-- <p class="host">Hosted by {{ podcast.url }}</p> -->
+        <!-- <p class="description">{{ podcast.description }}</p> -->
     </div>
   </div>
 </template>
@@ -43,7 +42,7 @@ const showEpisodes = () => {
 
 .podcast-image {
   width: 100%;
-  height: 200px;
+  height:200px;
   object-fit: cover;
 }
 

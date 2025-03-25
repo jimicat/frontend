@@ -20,7 +20,7 @@ const handleLogin = async () => {
         email: email.value,
         password: password.value,
       });
-
+      console.log('登录响应:', response.data);
       // 如果登录成功
       if (response.data.success) {
         // 将登录状态存储在 localStorage 中
