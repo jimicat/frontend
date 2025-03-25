@@ -8,7 +8,7 @@ import Sidebar from './components/Sidebar.vue';
     <div class="flex-1">
       <main class="ml-64 transition-all duration-300 relative">
         <keep-alive>
-          <router-view class="pt-20 h-screen overflow-y-scroll"></router-view>
+          <router-view class="pt-20 h-screen"></router-view>
         </keep-alive>
       </main>
     </div>

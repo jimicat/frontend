@@ -35,9 +35,9 @@ onMounted(fetchPodcasts);
       <input type="text" placeholder="搜索播客" class="w-1/2 p-2 text-lg border border-gray-300 rounded-lg" />
     </div>
     <h1 class="text-3xl font-bold mb-4 text-gray-800">精选推荐</h1>
-    <div class="podcasts-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+    <div class="podcasts-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-8 mb-8">
       <PodcastCard
-        v-for="podcast in podcasts.slice(0, 3)"
+        v-for="podcast in podcasts.slice(0, 12)"
         :key="podcast.id"
         :podcast="podcast"
       />
@@ -70,3 +70,4 @@ onMounted(fetchPodcasts);
     </div>
   </div>
 </template>
+
