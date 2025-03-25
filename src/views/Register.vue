@@ -2,12 +2,14 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import { useLocalStorage } from '@vueuse/core';
 
 const router = useRouter();
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const error = ref('');
+const isLoggedIn = useLocalStorage('isLoggedIn', false);
 
 const handleRegister = async () => {
   if (password.value !== confirmPassword.value) {
@@ -22,7 +24,18 @@ const handleRegister = async () => {
     });
 
     if (response.status === 201) {
-      router.push('/login');
+      const loginResponse = await axios.post('http://127.0.0.1:8000/api/login/', {
+        email: email.value,
+        password: password.value,
+      });
+
+      if (loginResponse.data.success) {
+        localStorage.setItem('isLoggedIn', 'true');
+        isLoggedIn.value = true;
+        router.push('/');
+      } else {
+        error.value = 'Registration succeeded but login failed. Please try to login manually.';
+      }
     } else {
       error.value = 'Registration failed. Please try again.';
     }

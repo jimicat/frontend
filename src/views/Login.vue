@@ -1,18 +1,30 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
+import { useLocalStorage } from '@vueuse/core';
 
 const router = useRouter();
 const email = ref('');
 const password = ref('');
 const error = ref('');
+const isLoggedIn = useLocalStorage('isLoggedIn', false);
 
 const handleLogin = async () => {
   try {
-    // Mock login logic
     if (email.value && password.value) {
-      localStorage.setItem('isLoggedIn', 'true');
-      router.push('/');
+      const response = await axios.post('http://127.0.0.1:8000/api/login/', {
+        email: email.value,
+        password: password.value,
+      });
+
+      if (response.data.success) {
+        localStorage.setItem('isLoggedIn', 'true');
+        isLoggedIn.value = true;
+        router.push('/');
+      } else {
+        error.value = 'Invalid email or password';
+      }
     } else {
       error.value = 'Please enter both email and password';
     }
@@ -50,6 +62,7 @@ const handleLogin = async () => {
         <p v-if="error" class="error">{{ error }}</p>
         <button type="submit" class="login-button">Login</button>
       </form>
+      <p>Don't have an account? <router-link to="/register">Register</router-link></p>
     </div>
   </div>
 </template>
@@ -61,7 +74,6 @@ const handleLogin = async () => {
   align-items: center;
   min-height: 100vh;
   padding: 2rem;
-  /* 添加以下代码确保居中 */
   margin: 0 auto;
 }
 

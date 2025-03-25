@@ -14,8 +14,6 @@ const handleLogin = () => {
     router.push('/login');
   }
 };
-
-
 </script>
 
 <template>
@@ -42,6 +40,8 @@ const handleLogin = () => {
     </div>
   </div>
 </template>
+
+
 <style scoped>
 .sidebar {
   position: fixed;
