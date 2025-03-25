@@ -37,10 +37,10 @@ const handleRegister = async () => {
         error.value = 'Registration succeeded but login failed. Please try to login manually.';
       }
     } else {
-      error.value = 'Registration failed. Please try again.';
+      error.value = response.data.message || 'Registration failed. Please try again.';
     }
   } catch (err) {
-    error.value = 'Registration failed. Please try again.';
+    error.value = (err as any).response?.data?.message || 'Registration failed. Please try again.';
   }
 };
 </script>
