@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Sidebar from './components/Sidebar.vue';
+import AudioPlay from './components/AudioPlay.vue';
 </script>
 
 <template>
@@ -10,6 +11,7 @@ import Sidebar from './components/Sidebar.vue';
         <keep-alive>
           <router-view class="pt-20 h-screen"></router-view>
         </keep-alive>
+        <AudioPlay />
       </main>
     </div>
   </div>
