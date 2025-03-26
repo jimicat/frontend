@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { useLocalStorage } from '@vueuse/core';
+import { isLoggedIn, logout } from '../utils/auth';
 
 const router = useRouter();
-const isLoggedIn = useLocalStorage('isLoggedIn', false);
 
 const handleLogout = () => {
-  localStorage.removeItem('isLoggedIn');
-  isLoggedIn.value = false;
+  logout();
   router.push('/login');
 };
 </script>
@@ -16,7 +14,7 @@ const handleLogout = () => {
   <div class="user-profile-container">
     <div class="sidebar">
       <nav class="nav-links">
-        <router-link to="/user/subscriptions" class="nav-item">订阅</router-link>
+        <router-link to="/subscribe" class="nav-item">订阅</router-link>
         <router-link to="/user/favorites" class="nav-item">收藏</router-link>
         <router-link to="/user/playlists" class="nav-item">播放列表</router-link>
         <button class="nav-item logout-button" @click="handleLogout">退出登录</button>

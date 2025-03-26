@@ -79,4 +79,27 @@ export default {
       return []; // 返回一个空数组，防止程序崩溃
     }
   },
+  async getSubcribedPodcasts(): Promise<Podcast[]> {
+    try {
+      // 发送请求
+      const response = await api.get("/subscribe");
+
+      // 打印整个 response 查看结构
+      console.log(response);
+
+      // 确保返回的数据结构符合预期
+      if (Array.isArray(response.data)) {
+        return response.data; // 假设返回的是直接一个播客数组
+      } else if (response.data && Array.isArray(response.data.podcasts)) {
+        return response.data.podcasts; // 如果返回的是一个对象并包含 podcasts 数组
+      } else {
+        console.error("返回数据格式错误，未找到 podcasts 数据");
+        return [];
+      }
+    } catch (error) {
+      // 捕获请求错误并打印
+      console.error("获取播客数据失败:", error);
+      return []; // 返回一个空数组，防止程序崩溃
+    }
+  }
 };

@@ -2,14 +2,12 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import { useLocalStorage } from '@vueuse/core';
+import { login, error } from '../utils/auth';
 
 const router = useRouter();
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
-const error = ref('');
-const isLoggedIn = useLocalStorage('isLoggedIn', false);
 
 const handleRegister = async () => {
   if (password.value !== confirmPassword.value) {
@@ -24,14 +22,7 @@ const handleRegister = async () => {
     });
 
     if (response.status === 201) {
-      const loginResponse = await axios.post('http://127.0.0.1:8000/api/login/', {
-        email: email.value,
-        password: password.value,
-      });
-
-      if (loginResponse.data.success) {
-        localStorage.setItem('isLoggedIn', 'true');
-        isLoggedIn.value = true;
+      if (await login(email.value, password.value)) {
         router.push('/');
       } else {
         error.value = 'Registration succeeded but login failed. Please try to login manually.';
@@ -46,113 +37,48 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <div class="register-container">
-    <div class="register-card">
-      <h2>Register</h2>
-      <form @submit.prevent="handleRegister" class="register-form">
-        <div class="form-group">
-          <label for="email">Email</label>
+  <div class="flex items-center justify-center min-h-screen bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+      <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">注册</h2>
+      <form @submit.prevent="handleRegister" class="space-y-6">
+        <div class="space-y-2">
+          <label for="email" class="block text-sm font-medium text-gray-700">邮箱</label>
           <input
             id="email"
             type="email"
             v-model="email"
             required
-            placeholder="Enter your email"
+            placeholder="请输入邮箱"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           >
         </div>
-        <div class="form-group">
-          <label for="password">Password</label>
+        <div class="space-y-2">
+          <label for="password" class="block text-sm font-medium text-gray-700">密码</label>
           <input
             id="password"
             type="password"
             v-model="password"
             required
-            placeholder="Enter your password"
+            placeholder="请输入密码"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           >
         </div>
-        <div class="form-group">
-          <label for="confirmPassword">Confirm Password</label>
+        <div class="space-y-2">
+          <label for="confirmPassword" class="block text-sm font-medium text-gray-700">确认密码</label>
           <input
             id="confirmPassword"
             type="password"
             v-model="confirmPassword"
             required
-            placeholder="Confirm your password"
+            placeholder="请再次输入密码"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           >
         </div>
-        <p v-if="error" class="error">{{ error }}</p>
-        <button type="submit" class="register-button">Register</button>
+        <p v-if="error" class="text-red-500 text-sm">{{ error }}</p>
+        <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          注册
+        </button>
       </form>
     </div>
   </div>
 </template>
-
-<style scoped>
-.register-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 2rem;
-}
-
-.register-card {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-}
-
-h2 {
-  margin-bottom: 1.5rem;
-  text-align: center;
-  color: #333;
-}
-
-.register-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-label {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-input {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.error {
-  color: #dc3545;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-}
-
-.register-button {
-  background: #2c3e50;
-  color: white;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.register-button:hover {
-  background: #34495e;
-}
-</style>
