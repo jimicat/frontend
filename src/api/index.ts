@@ -2,7 +2,7 @@ import axios from "axios";
 import type { Episode } from "../types/episode";
 import type { Podcast } from "../types/podcast";
 
-const API_BASE_URL = "http://127.0.0.1:8000/api"; // FastAPI 服务器地址
+const API_BASE_URL = "http://127.0.0.1:5000/api"; // FastAPI 服务器地址
 // const API_BASE_URL ="https://podapi.ywnote.com/api";
 
 const api = axios.create({
@@ -14,11 +14,11 @@ const api = axios.create({
 });
 
 export default {
-  // 获取播客列表
+  // 获取trending列表
   async getPodcasts(): Promise<Podcast[]> {
     try {
       // 发送请求
-      const response = await api.get("/podcasts_tending");
+      const response = await api.get("/trending");
 
       // 打印整个 response 查看结构
       console.log(response);
@@ -101,5 +101,5 @@ export default {
       console.error("获取播客数据失败:", error);
       return []; // 返回一个空数组，防止程序崩溃
     }
-  }
+  },
 };

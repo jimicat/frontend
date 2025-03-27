@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { isLoggedIn, logout } from '../utils/auth';
+import { logout } from '../utils/auth';
 
 const router = useRouter();
 
@@ -11,68 +11,47 @@ const handleLogout = () => {
 </script>
 
 <template>
-  <div class="user-profile-container">
-    <div class="sidebar">
-      <nav class="nav-links">
-        <router-link to="/subscribe" class="nav-item">订阅</router-link>
-        <router-link to="/user/favorites" class="nav-item">收藏</router-link>
-        <router-link to="/user/playlists" class="nav-item">播放列表</router-link>
-        <button class="nav-item logout-button" @click="handleLogout">退出登录</button>
-      </nav>
-    </div>
-    <div class="content">
-      <router-view></router-view>
+  <div class="min-h-screen bg-gray-100 flex flex-col items-center py-10">
+    <div class="w-full max-w-4xl bg-white shadow-md rounded-lg p-6">
+      <h1 class="text-2xl font-bold text-gray-800 mb-6">用户中心</h1>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- 收藏 Section -->
+        <div class="bg-blue-50 p-4 rounded-lg shadow-sm text-center">
+          <h2 class="text-lg font-semibold text-blue-600 mb-2">收藏</h2>
+          <router-link
+            to="/user/favorites"
+            class="text-blue-500 hover:underline"
+          >
+            查看收藏
+          </router-link>
+        </div>
+
+        <!-- 订阅 Section -->
+        <div class="bg-green-50 p-4 rounded-lg shadow-sm text-center">
+          <h2 class="text-lg font-semibold text-green-600 mb-2">订阅</h2>
+          <router-link
+            to="/user/subscriptions"
+            class="text-green-500 hover:underline"
+          >
+            管理订阅
+          </router-link>
+        </div>
+
+        <!-- 退出登录 Section -->
+        <div class="bg-red-50 p-4 rounded-lg shadow-sm text-center">
+          <h2 class="text-lg font-semibold text-red-600 mb-2">退出登录</h2>
+          <button
+            @click="handleLogout"
+            class="text-red-500 hover:underline focus:outline-none"
+          >
+            点击退出
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.user-profile-container {
-  display: flex;
-}
-
-.sidebar {
-  width: 250px;
-  background: #f5f5f5;
-  color: #333;
-  padding: 1rem;
-}
-
-.nav-links {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.nav-item {
-  color: #333;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-}
-
-.nav-item:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-}
-
-.logout-button {
-  background: none;
-  border: none;
-  color: #333;
-  cursor: pointer;
-  text-align: left;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-}
-
-.logout-button:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-}
-
-.content {
-  flex: 1;
-  padding: 2rem;
-}
+/* Add any additional custom styles here if needed */
 </style>
