@@ -32,12 +32,12 @@ export default function Home() {
 
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold tracking-tight">Discover Episodes</h1>
-            <p className="text-muted-foreground">Listen to the latest episodes from your favorite podcasters</p>
+            <p className="text-muted-foreground">收听您喜爱的播客提供的最新节目</p>
           </div>
 
-          <CategoryFilter />
+          {/* <CategoryFilter /> */}
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <EpisodeCard
               id="episode-1"
               title="The Future of AI in Everyday Life"
@@ -110,6 +110,30 @@ export default function Home() {
               views={2341}
               isFavorite={false}
             />
+            <EpisodeCard
+              id="episode-7"
+              title="Travel on a Budget: Hidden Gems"
+              description="Discover amazing destinations that won't break the bank and tips for traveling economically."
+              image="/placeholder.svg?height=400&width=400"
+              duration="42:55"
+              date="Mar 10, 2024"
+              category="Travel"
+              author="Nomad Nick"
+              views={2341}
+              isFavorite={false}
+            />
+            <EpisodeCard
+              id="episode-8"
+              title="Travel on a Budget: Hidden Gems"
+              description="Discover amazing destinations that won't break the bank and tips for traveling economically."
+              image="/placeholder.svg?height=400&width=400"
+              duration="42:55"
+              date="Mar 10, 2024"
+              category="Travel"
+              author="Nomad Nick"
+              views={2341}
+              isFavorite={false}
+            />
           </div>
 
           <Pagination>
@@ -132,7 +156,7 @@ export default function Home() {
             </PaginationContent>
           </Pagination>
 
-          <Newsletter />
+          {/* <Newsletter /> */}
         </div>
       </div>
       <AudioPlayer />
