@@ -1,28 +1,35 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
+export function formatDate(dateString: string): string {
+  const date = new Date(dateString)
+  const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", day: "numeric" }
+  return date.toLocaleDateString("zh-CN", options)
+}
+
+export function formatDuration(durationString: string): string {
+  // Assuming durationString is in the format "MM:SS" or "HH:MM:SS"
+  const parts = durationString.split(":")
+  const seconds = Number.parseInt(parts.pop() || "0", 10)
+  const minutes = Number.parseInt(parts.pop() || "0", 10)
+  const hours = Number.parseInt(parts.pop() || "0", 10)
+
+  let formattedDuration = ""
+
+  if (hours > 0) {
+    formattedDuration += `${hours} 小时 `
+  }
+
+  if (minutes > 0 || hours > 0) {
+    formattedDuration += `${minutes} 分钟 `
+  }
+
+  formattedDuration += `${seconds} 秒`
+
+  return formattedDuration.trim()
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Ensure this file contains the export for formatDate
-export function formatDate(date: string): string {
-  // Implementation for formatDate
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-  return new Date(date).toLocaleDateString(undefined, options);
-}
-
-export function formatDuration(duration: number): string {
-  // Converts duration in seconds to a human-readable format (e.g., "1h 2m 3s")
-  const hours = Math.floor(duration / 3600);
-  const minutes = Math.floor((duration % 3600) / 60);
-  const seconds = duration % 60;
-
-  return [
-    hours > 0 ? `${hours}h` : null,
-    minutes > 0 ? `${minutes}m` : null,
-    seconds > 0 ? `${seconds}s` : null,
-  ]
-    .filter(Boolean)
-    .join(" ");
-}

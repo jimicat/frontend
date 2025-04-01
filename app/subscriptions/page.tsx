@@ -1,3 +1,6 @@
+"use client"
+
+import { useState } from "react"
 import { PodcastLayout } from "@/components/podcast-layout"
 import { AudioPlayer } from "@/components/audio-player"
 import { Button } from "@/components/ui/button"
@@ -8,11 +11,64 @@ import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Headphones, Search, Bell, Filter, Play, Plus, MoreHorizontal, ArrowUpRight, Clock } from "lucide-react"
+import {
+  Headphones,
+  Search,
+  Bell,
+  Filter,
+  Play,
+  Plus,
+  MoreHorizontal,
+  ArrowUpRight,
+  Clock,
+  Loader2,
+  AlertCircle,
+} from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import Image from "next/image"
 import Link from "next/link"
+import { useSubscriptions } from "@/hooks/use-subscriptions"
+import { useTrending } from "@/hooks/use-trending"
 
 export default function SubscriptionsPage() {
+  const { subscriptions, isLoading, error, unsubscribeFromPodcast } = useSubscriptions()
+  const { trendingPodcasts } = useTrending()
+  const [searchQuery, setSearchQuery] = useState("")
+  const [sortBy, setSortBy] = useState("recent")
+  const [activeTab, setActiveTab] = useState("all")
+  const [unsubscribing, setUnsubscribing] = useState<string | null>(null)
+
+  // 搜索和排序订阅
+  const filteredSubscriptions = subscriptions
+    .filter(
+      (podcast) =>
+        podcast.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        podcast.author.toLowerCase().includes(searchQuery.toLowerCase()),
+    ).sort((a, b) => {
+      if (sortBy === "recent") {
+        // 假设有更新日期字段，如果没有，可以使用ID或其他字段
+        return b.id.localeCompare(a.id)
+      } else if (sortBy === "name") {
+        return a.title.localeCompare(b.title)
+      } else if (sortBy === "most-episodes") {
+        // 假设有剧集数量字段
+        return (b.episodeCount || 0) - (a.episodeCount || 0)
+      }
+      return 0
+    })
+  
+    
+
+  // 处理取消订阅
+  const handleUnsubscribe = async (podcastId: string) => {
+    setUnsubscribing(podcastId)
+    try {
+      await unsubscribeFromPodcast(podcastId)
+    } finally {
+      setUnsubscribing(null)
+    }
+  }
+
   return (
     <PodcastLayout>
       <div className="container px-4 py-6 md:px-6 lg:px-8">
@@ -28,11 +84,17 @@ export default function SubscriptionsPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="relative w-full sm:max-w-xs">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input type="search" placeholder="搜索您的订阅..." className="w-full pl-8" />
+              <Input
+                type="search"
+                placeholder="搜索您的订阅..."
+                className="w-full pl-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <Select defaultValue="recent">
+              <Select defaultValue="recent" value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-full sm:w-[180px]">
                   <SelectValue placeholder="排序方式" />
                 </SelectTrigger>
@@ -40,7 +102,6 @@ export default function SubscriptionsPage() {
                   <SelectItem value="recent">最近更新</SelectItem>
                   <SelectItem value="name">名称</SelectItem>
                   <SelectItem value="most-episodes">剧集数量</SelectItem>
-                  <SelectItem value="recently-added">最近添加</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -51,7 +112,7 @@ export default function SubscriptionsPage() {
             </div>
           </div>
 
-          <Tabs defaultValue="all" className="w-full">
+          <Tabs defaultValue="all" className="w-full" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="w-full sm:w-auto">
               <TabsTrigger value="all" className="flex-1 sm:flex-initial">
                 全部
@@ -68,19 +129,63 @@ export default function SubscriptionsPage() {
             </TabsList>
 
             <TabsContent value="all" className="mt-6">
-              <SubscriptionsList />
+              {isLoading ? (
+                <div className="flex h-64 items-center justify-center">
+                  <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="h-12 w-12 animate-spin text-purple-600" />
+                    <p className="text-muted-foreground">加载订阅中...</p>
+                  </div>
+                </div>
+              ) : error ? (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              ) : filteredSubscriptions.length === 0 ? (
+                <div className="flex h-64 flex-col items-center justify-center gap-4 text-center">
+                  <p className="text-muted-foreground">
+                    {searchQuery ? `没有找到匹配"${searchQuery}"的订阅` : "您还没有订阅任何播客"}
+                  </p>
+                  {!searchQuery && (
+                    <Button asChild className="bg-purple-600 hover:bg-purple-700">
+                      <Link href="/">浏览播客</Link>
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <SubscriptionsList
+                  subscriptions={filteredSubscriptions}
+                  unsubscribing={unsubscribing}
+                  onUnsubscribe={handleUnsubscribe}
+                />
+              )}
             </TabsContent>
 
             <TabsContent value="unplayed" className="mt-6">
-              <SubscriptionsList filter="unplayed" />
+              <SubscriptionsList
+                filter="unplayed"
+                subscriptions={filteredSubscriptions}
+                unsubscribing={unsubscribing}
+                onUnsubscribe={handleUnsubscribe}
+              />
             </TabsContent>
 
             <TabsContent value="in-progress" className="mt-6">
-              <SubscriptionsList filter="in-progress" />
+              <SubscriptionsList
+                filter="in-progress"
+                subscriptions={filteredSubscriptions}
+                unsubscribing={unsubscribing}
+                onUnsubscribe={handleUnsubscribe}
+              />
             </TabsContent>
 
             <TabsContent value="favorites" className="mt-6">
-              <SubscriptionsList filter="favorites" />
+              <SubscriptionsList
+                filter="favorites"
+                subscriptions={filteredSubscriptions}
+                unsubscribing={unsubscribing}
+                onUnsubscribe={handleUnsubscribe}
+              />
             </TabsContent>
           </Tabs>
 
@@ -96,6 +201,7 @@ export default function SubscriptionsPage() {
 
             <div className="rounded-lg border">
               <div className="divide-y">
+                {/* 这里应该从API获取最新剧集，目前使用模拟数据 */}
                 {[1, 2, 3, 4, 5].map((episode) => (
                   <div key={episode} className="flex items-center gap-4 p-4">
                     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md">
@@ -156,32 +262,33 @@ export default function SubscriptionsPage() {
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {[1, 2, 3, 4].map((podcast) => (
-                <div key={podcast} className="group rounded-lg border p-4 transition-all hover:shadow-md">
+              {trendingPodcasts.slice(0, 4).map((podcast) => (
+                <div key={podcast.id} className="group rounded-lg border p-4 transition-all hover:shadow-md">
                   <div className="flex flex-col">
                     <div className="relative mb-4 aspect-square w-full overflow-hidden rounded-lg">
                       <Image
-                        src={`/placeholder.svg?height=200&width=200&text=R${podcast}`}
-                        alt={`Recommended Podcast ${podcast}`}
+                        src={podcast.image || `/placeholder.svg?height=200&width=200&text=R${podcast.id}`}
+                        alt={podcast.title}
                         fill
                         className="object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     </div>
-                    <h3 className="text-lg font-bold">推荐播客 {podcast}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-                      这是一个关于{["科技创新", "商业策略", "健康生活", "音乐文化"][podcast - 1]}
-                      的热门播客，深受听众喜爱。
-                    </p>
+                    <h3 className="text-lg font-bold">{podcast.title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{podcast.description}</p>
                     <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>{podcast * 50 + 100} 集</span>
+                      <span>{podcast.author || 10} 集</span>
                       <span>•</span>
                       <span>每周更新</span>
                     </div>
                     <div className="mt-3 flex items-center justify-between">
-                      <Badge variant="outline">{["科技", "商业", "健康", "音乐"][podcast - 1]}</Badge>
-                      <Button size="sm" className="gap-1 bg-purple-600 text-white hover:bg-purple-700">
+                      <Badge variant="outline">{podcast.id}</Badge>
+                      <Button
+                        size="sm"
+                        className="gap-1 bg-purple-600 text-white hover:bg-purple-700"
+                        onClick={() => (window.location.href = `/podcast/${podcast.id}`)}
+                      >
                         <Plus className="h-3 w-3" />
-                        订阅
+                        查看
                       </Button>
                     </div>
                   </div>
@@ -250,35 +357,67 @@ export default function SubscriptionsPage() {
   )
 }
 
-function SubscriptionsList({ filter }: { filter?: string }) {
-  // 这里可以根据filter参数筛选不同的订阅列表
-  // 为了演示，我们使用相同的数据
+interface SubscriptionsListProps {
+  subscriptions: any[]
+  filter?: string
+  unsubscribing: string | null
+  onUnsubscribe: (podcastId: string) => void
+}
+
+function SubscriptionsList({ subscriptions, filter, unsubscribing, onUnsubscribe }: SubscriptionsListProps) {
+  // 根据filter参数筛选不同的订阅列表
+  // 为了演示，我们使用相同的数据，但在实际应用中可以根据filter显示不同内容
+  let filteredList = subscriptions
+
+  if (filter === "unplayed") {
+    // 模拟未播放的筛选
+    filteredList = subscriptions.filter((_, index) => index % 3 !== 0)
+  } else if (filter === "in-progress") {
+    // 模拟进行中的筛选
+    filteredList = subscriptions.filter((_, index) => index % 4 === 0)
+  } else if (filter === "favorites") {
+    // 模拟收藏的筛选
+    filteredList = subscriptions.filter((_, index) => index % 2 === 0)
+  }
+
+  if (filteredList.length === 0) {
+    return (
+      <div className="flex h-64 flex-col items-center justify-center gap-4 text-center">
+        <p className="text-muted-foreground">
+          {filter === "unplayed" && "没有未播放的剧集"}
+          {filter === "in-progress" && "没有进行中的剧集"}
+          {filter === "favorites" && "没有收藏的播客"}
+          {!filter && "没有订阅的播客"}
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((podcast) => (
-        <div key={podcast} className="group rounded-lg border p-4 transition-all hover:shadow-md">
+      {filteredList.map((podcast) => (
+        <div key={podcast.id} className="group rounded-lg border p-4 transition-all hover:shadow-md">
           <div className="flex gap-4">
             <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">
               <Image
-                src={`/placeholder.svg?height=100&width=100&text=P${podcast}`}
-                alt={`Podcast ${podcast}`}
+                src={podcast.image_url || `/placeholder.svg?height=100&width=100&text=P${podcast.id}`}
+                alt={podcast.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
             </div>
             <div className="flex-1 min-w-0">
-              <Link href={`/podcast/podcast-${podcast}`} className="hover:underline">
-                <h3 className="font-medium">订阅播客 {podcast}</h3>
+              <Link href={`/podcast/${podcast.id}`} className="hover:underline">
+                <h3 className="font-medium">{podcast.title}</h3>
               </Link>
               <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                 <Badge variant="outline" className="text-xs">
-                  {["科技", "商业", "健康", "音乐", "美食", "旅行", "教育", "娱乐", "科学"][podcast - 1]}
+                  {podcast.category}
                 </Badge>
               </div>
               <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                <span>{podcast * 10 + 5} 集</span>
-                {podcast % 3 === 0 && (
+                <span>{podcast.episode_count || 10} 集</span>
+                {podcast.has_new && (
                   <>
                     <span>•</span>
                     <span className="flex items-center text-purple-600">
@@ -286,7 +425,7 @@ function SubscriptionsList({ filter }: { filter?: string }) {
                     </span>
                   </>
                 )}
-                {podcast % 4 === 0 && (
+                {podcast.in_progress && (
                   <>
                     <span>•</span>
                     <span className="flex items-center text-amber-600">
@@ -299,13 +438,20 @@ function SubscriptionsList({ filter }: { filter?: string }) {
             </div>
           </div>
           <div className="mt-3 flex items-center justify-between border-t pt-3">
-            <Button variant="ghost" size="sm" className="h-8 px-2">
-              <Play className="mr-1 h-4 w-4" />
-              最新剧集
+            <Button variant="ghost" size="sm" className="h-8 px-2" asChild>
+              <Link href={`/podcast/${podcast.id}`}>
+                <Play className="mr-1 h-4 w-4" />
+                查看
+              </Link>
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">更多选项</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+              onClick={() => onUnsubscribe(podcast.id)}
+              disabled={unsubscribing === podcast.id}
+            >
+              {unsubscribing === podcast.id ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : "取消订阅"}
             </Button>
           </div>
         </div>

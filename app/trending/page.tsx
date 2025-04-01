@@ -129,7 +129,7 @@ function TrendingContent({
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {podcasts.slice(0, 9).map((podcast) => (
+          {podcasts.slice(0, 8).map((podcast) => (
             <PodcastCard
               key={podcast.id}
               id={podcast.id}

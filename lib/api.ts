@@ -26,6 +26,7 @@ export type Podcast = {
   categories: { [key: string]: string }
   website: string
   feed_url: string
+  episodeCount: number
 }
 
 // 剧集类型
@@ -183,9 +184,9 @@ class ApiClient {
   }
 
     // 获取单个播客详情
-    async getPodcastDetails(podcastId: string): Promise<ApiResponse<Podcast>> {
-      return this.fetchApi<Podcast>(`/api/podcast_detail/${podcastId}`, "GET", undefined, false)
-    }
+  async getPodcastDetails(podcastId: string): Promise<ApiResponse<Podcast>> {
+    return this.fetchApi<Podcast>(`/api/podcast_detail/${podcastId}`, "GET", undefined, false)
+  }
 }
 
 // 导出API客户端实例
