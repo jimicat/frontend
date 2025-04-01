@@ -39,23 +39,24 @@ export default function SubscriptionsPage() {
   const [unsubscribing, setUnsubscribing] = useState<string | null>(null)
 
   // 搜索和排序订阅
-  const filteredSubscriptions = subscriptions
-    .filter(
-      (podcast) =>
-        podcast.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        podcast.author.toLowerCase().includes(searchQuery.toLowerCase()),
-    ).sort((a, b) => {
-      if (sortBy === "recent") {
-        // 假设有更新日期字段，如果没有，可以使用ID或其他字段
-        return b.id.localeCompare(a.id)
-      } else if (sortBy === "name") {
-        return a.title.localeCompare(b.title)
-      } else if (sortBy === "most-episodes") {
-        // 假设有剧集数量字段
-        return (b.episodeCount || 0) - (a.episodeCount || 0)
-      }
-      return 0
-    })
+  const filteredSubscriptions = Array.isArray(subscriptions)
+  ? subscriptions
+      .filter(
+        (podcast) =>
+          podcast.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          podcast.author.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      .sort((a, b) => {
+        if (sortBy === "recent") {
+          return b.id.localeCompare(a.id)
+        } else if (sortBy === "name") {
+          return a.title.localeCompare(b.title)
+        } else if (sortBy === "most-episodes") {
+          return (b.episodeCount || 0) - (a.episodeCount || 0)
+        }
+        return 0
+      })
+  : []
   
     
 

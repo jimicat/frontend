@@ -15,23 +15,26 @@ export function useSubscriptions() {
   // 获取用户订阅
   const fetchSubscriptions = async () => {
     if (!user) {
-      setSubscriptions([])
+      setSubscriptions([]) // Ensure subscriptions is an array
       setIsLoading(false)
       return
     }
-
+  
     setIsLoading(true)
     setError(null)
-
+  
     try {
       const response = await api.getSubscriptions()
+  
+      if ( Array.isArray(response.data)) {
+        setSubscriptions(response.data) // Ensure data is an array
 
-      if (response.success && response.data) {
-        setSubscriptions(response.data)
       } else {
+        setSubscriptions([]) // Fallback to an empty array
         setError(response.message || "获取订阅失败")
       }
     } catch (err) {
+      setSubscriptions([]) // Fallback to an empty array on error
       setError("获取订阅时发生错误")
       console.error(err)
     } finally {
