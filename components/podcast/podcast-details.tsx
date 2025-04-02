@@ -223,13 +223,29 @@ export function PodcastDetails({ podcastId }: { podcastId: string }) {
                           </p>
                         </div>
                         <div className="flex shrink-0 gap-2">
-                          <Button
+                        <Button
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
                             onClick={() => {
+                              const audioData = {
+                                id: episode.id,
+                                title: episode.title,
+                                enclosureUrl: episode.enclosureUrl,
+                                duration: episode.duration,
+                                image: episode.image || podcast.image,
+                                podcast: podcast.title,
+                                description: episode.description,
+                                author: podcast.author
+                              };
+                              console.log('播放数据:', audioData);
+                              // 确保 enclosureUrl 存在
+                              if (!episode.enclosureUrl) {
+                                console.error('音频文件 URL 不存在');
+                                return;
+                              }
                               setSelectedEpisode(episode.id);
-                              setEpisodeData(episode);
+                              setEpisodeData(audioData);
                             }}
                           >
                             <Play className="h-4 w-4" />
@@ -293,9 +309,12 @@ export function PodcastDetails({ podcastId }: { podcastId: string }) {
           </Tabs>
         </div>
       </div>
-
-      {/* 音频播放器 */}
-      {selectedEpisode && <AudioPlayer episode={episodeData} />}
+      
+      {selectedEpisode && episodeData && (
+        <div className="fixed bottom-0 left-0 right-0 z-50">
+          <AudioPlayer episode={episodeData} />
+        </div>
+      )}
     </div>
   );
 }
