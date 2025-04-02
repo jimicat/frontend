@@ -291,7 +291,14 @@ export function PodcastDetails({ podcastId }: { podcastId: string }) {
       </div>
 
       {/* 音频播放器 */}
-      {selectedEpisode && <AudioPlayer />}
+      {selectedEpisode && <AudioPlayer episode={{
+        id: "",
+        title: "",
+        enclosureUrl: "",
+        image: "",
+        podcast: "",
+        duration: 0
+      }} />}
     </div>
   );
 }

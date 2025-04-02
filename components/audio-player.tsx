@@ -24,8 +24,25 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { useRef } from "react"
 
-export function AudioPlayer() {
+interface AudioPlayerProps {
+  episode?: {
+    id: string
+    title: string
+    enclosureUrl: string
+    image: string
+    podcast: string
+    duration: number
+  }
+}
+
+export function AudioPlayer({ episode }: AudioPlayerProps) {
+  // Add default values and early return if no episode
+  if (!episode) {
+    return null
+  }
+
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -33,15 +50,77 @@ export function AudioPlayer() {
   const [speed, setSpeed] = useState(1)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
+  
+  // 添加音频引用
+  const audioRef = useRef<HTMLAudioElement>(null)
 
-  // Format time in MM:SS
+
+  // 处理播放/暂停
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause()
+      } else {
+        audioRef.current.play()
+      }
+      setIsPlaying(!isPlaying)
+    }
+  }
+
+  // 处理音频时间更新
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime)
+    }
+  }
+
+  // 处理音频加载完成
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration)
+    }
+  }
+
+  // 处理进度条改变
+  const handleSeek = (value: number[]) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = value[0]
+      setCurrentTime(value[0])
+    }
+  }
+
+  // 处理音量改变
+  const handleVolumeChange = (value: number[]) => {
+    const newVolume = value[0] / 100
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume
+    }
+    setVolume(newVolume)
+  }
+
+  // 处理播放速度改变
+  const handleSpeedChange = (newSpeed: number) => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = newSpeed
+    }
+    setSpeed(newSpeed)
+  }
+
+  // 快进快退
+  const handleSkip = (seconds: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.max(0, Math.min(audioRef.current.currentTime + seconds, duration))
+    }
+  }
+
+  // Fix formatTime function implementation
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60)
     const seconds = Math.floor(time % 60)
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`
   }
 
-  // Get volume icon based on volume level
+  // Fix getVolumeIcon function implementation
   const getVolumeIcon = () => {
     if (volume === 0) return <VolumeX className="h-5 w-5" />
     if (volume < 0.5) return <Volume1 className="h-5 w-5" />
@@ -49,21 +128,28 @@ export function AudioPlayer() {
   }
 
   return (
-    <div
-      className={cn(
+    <>
+      <audio
+        ref={audioRef}
+        src={episode.enclosureUrl}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        onEnded={() => setIsPlaying(false)}
+      />
+      
+      {/* Update image and text content to use episode data */}
+      <div className={cn(
         "fixed bottom-0 left-0 right-0 border-t bg-background p-3 shadow-lg transition-all duration-300",
         isFullscreen ? "h-[calc(100vh-4rem)]" : "h-auto",
-      )}
-    >
-      <div className="container flex flex-col gap-4">
+      )}>
         {isFullscreen && (
           <div className="flex flex-col items-center justify-center gap-6 py-8">
             <div className="relative aspect-square w-full max-w-md overflow-hidden rounded-lg">
-              <Image src="/placeholder.svg?height=400&width=400" alt="Current episode" fill className="object-cover" />
+              <Image src={episode.image} alt={episode.title} fill className="object-cover" />
             </div>
             <div className="text-center">
-              <h2 className="text-2xl font-bold">The Future of AI in Everyday Life</h2>
-              <p className="text-muted-foreground">Alex Johnson</p>
+              <h2 className="text-2xl font-bold">{episode.title}</h2>
+              <p className="text-muted-foreground">{episode.podcast}</p>
             </div>
             <div className="flex w-full max-w-md gap-4">
               <Button
@@ -126,16 +212,11 @@ export function AudioPlayer() {
             {!isFullscreen && (
               <>
                 <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md">
-                  <Image
-                    src="/placeholder.svg?height=100&width=100"
-                    alt="Current episode"
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={episode.image} alt={episode.title} fill className="object-cover" />
                 </div>
                 <div className="min-w-0">
-                  <h4 className="truncate text-sm font-medium">The Future of AI in Everyday Life</h4>
-                  <p className="truncate text-xs text-muted-foreground">Alex Johnson</p>
+                  <h4 className="truncate text-sm font-medium">{episode.title}</h4>
+                  <p className="truncate text-xs text-muted-foreground">{episode.podcast}</p>
                 </div>
               </>
             )}
@@ -256,7 +337,7 @@ export function AudioPlayer() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
