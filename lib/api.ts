@@ -190,7 +190,55 @@ class ApiClient {
   async getPodcastDetails(podcastId: string): Promise<ApiResponse<Podcast>> {
     return this.fetchApi<Podcast>(`/api/podcast_detail/${podcastId}`, "GET", undefined, false)
   }
+
+
+  // 获取收听历史
+  async getListeningHistory(): Promise<ApiResponse<any[]>> {
+    return this.fetchApi<any[]>("/api/history")
+  }
+
+  // 从历史记录中移除项目
+  async removeFromHistory(itemId: string): Promise<ApiResponse<any>> {
+    return this.fetchApi<any>("/api/history/remove", "POST", { item_id: itemId })
+  }
+
+  // 清除所有历史记录
+  async clearHistory(): Promise<ApiResponse<any>> {
+    return this.fetchApi<any>("/api/history/clear", "POST")
+  }
+
+  // 标记历史记录项为已完成
+  async markHistoryItemCompleted(itemId: string): Promise<ApiResponse<any>> {
+    return this.fetchApi<any>("/api/history/complete", "POST", { item_id: itemId })
+  }
+
+  // 获取通知列表
+  async getNotifications(): Promise<ApiResponse<any[]>> {
+    return this.fetchApi<any[]>("/api/notifications")
+  }
+
+  // 标记通知为已读
+  async markNotificationAsRead(notificationId: string): Promise<ApiResponse<any>> {
+    return this.fetchApi<any>("/api/notifications/read", "POST", { notification_id: notificationId })
+  }
+
+  // 标记所有通知为已读
+  async markAllNotificationsAsRead(): Promise<ApiResponse<any>> {
+    return this.fetchApi<any>("/api/notifications/read-all", "POST")
+  }
+
+  // 删除通知
+  async deleteNotification(notificationId: string): Promise<ApiResponse<any>> {
+    return this.fetchApi<any>("/api/notifications/delete", "POST", { notification_id: notificationId })
+  }
+
+  // 清除所有通知
+  async clearAllNotifications(): Promise<ApiResponse<any>> {
+    return this.fetchApi<any>("/api/notifications/clear", "POST")
+  }
 }
+
+
 
 // 导出API客户端实例
 export const api = new ApiClient()

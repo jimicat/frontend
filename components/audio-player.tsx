@@ -25,6 +25,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { useRef } from "react"
+import { useEffect } from "react"
 
 interface AudioPlayerProps {
   episode?: {
@@ -35,15 +36,46 @@ interface AudioPlayerProps {
     podcast: string
     duration: number
   }
+  isPlaying?: boolean // 添加 isPlaying prop
+  onPlayingChange?: (playing: boolean) => void // 添加回调函数
 }
 
-export function AudioPlayer({ episode }: AudioPlayerProps) {
+export function AudioPlayer({ episode, isPlaying: externalIsPlaying, onPlayingChange }: AudioPlayerProps) {
   // Add default values and early return if no episode
   if (!episode) {
     return null
   }
 
-  const [isPlaying, setIsPlaying] = useState(false)
+  const [internalIsPlaying, setInternalIsPlaying] = useState(false);
+  
+
+
+  useEffect(() => {
+    if (externalIsPlaying !== undefined && externalIsPlaying !== internalIsPlaying) {
+      if (externalIsPlaying) {
+        audioRef.current?.play();
+      } else {
+        audioRef.current?.pause();
+      }
+      setInternalIsPlaying(externalIsPlaying);
+    }
+  }, [externalIsPlaying]);
+
+  // 修改 togglePlay 函数
+  // Remove duplicate declaration since togglePlay is defined later
+  const handlePlayToggle = () => {
+    if (audioRef.current) {
+      if (internalIsPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      const newPlayingState = !internalIsPlaying;
+      setInternalIsPlaying(newPlayingState);
+      onPlayingChange?.(newPlayingState); // 通知父组件状态变化
+    }
+  }
+
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [volume, setVolume] = useState(0.7)
@@ -58,12 +90,14 @@ export function AudioPlayer({ episode }: AudioPlayerProps) {
   // 处理播放/暂停
   const togglePlay = () => {
     if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause()
+      if (internalIsPlaying) {
+        audioRef.current.pause();
       } else {
-        audioRef.current.play()
+        audioRef.current.play();
       }
-      setIsPlaying(!isPlaying)
+      const newPlayingState = !internalIsPlaying;
+      setInternalIsPlaying(newPlayingState);
+      onPlayingChange?.(newPlayingState); // 通知父组件状态变化
     }
   }
 
@@ -134,7 +168,10 @@ export function AudioPlayer({ episode }: AudioPlayerProps) {
         src={episode.enclosureUrl}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
-        onEnded={() => setIsPlaying(false)}
+        onEnded={() => {
+          setInternalIsPlaying(false);
+          onPlayingChange?.(false);
+        }}
       />
       
       {/* Update image and text content to use episode data */}
@@ -254,8 +291,8 @@ export function AudioPlayer({ episode }: AudioPlayerProps) {
                 className="h-10 w-10 rounded-full bg-purple-100 text-purple-700 hover:bg-purple-200 hover:text-purple-800 dark:bg-purple-900 dark:text-purple-300 dark:hover:bg-purple-800"
                 onClick={togglePlay}
               >
-                {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 translate-x-0.5" />}
-                <span className="sr-only">{isPlaying ? "Pause" : "Play"}</span>
+                {internalIsPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 translate-x-0.5" />}
+                <span className="sr-only">{internalIsPlaying ? "Pause" : "Play"}</span>
               </Button>
 
               <TooltipProvider>
