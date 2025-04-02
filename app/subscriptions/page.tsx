@@ -40,7 +40,7 @@ export default function SubscriptionsPage() {
   const [sortBy, setSortBy] = useState("recent")
   const [activeTab, setActiveTab] = useState("all")
   const [unsubscribing, setUnsubscribing] = useState<string | null>(null)
-  const { latestEpisodes, isLoading: loadingEpisodes } = useLatestEpisodes(subscriptions)
+  const { latestEpisodes, isLoading: loadingEpisodes, hasMore, loadMore } = useLatestEpisodes(subscriptions)
 
   // 搜索和排序订阅
   const filteredSubscriptions = Array.isArray(subscriptions)
@@ -206,64 +206,79 @@ export default function SubscriptionsPage() {
         </div>
 
         <div className="rounded-lg border">
-          <div className="divide-y">
-            {loadingEpisodes ? (
-              <div className="flex h-32 items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+        <div className="divide-y">
+        {loadingEpisodes ? (
+          <div className="flex h-32 items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+          </div>
+        ) : latestEpisodes.length === 0 ? (
+          <div className="flex h-32 items-center justify-center text-muted-foreground">
+            暂无最新剧集
+          </div>
+        ) : (
+          latestEpisodes.map((episode) => (
+            <div key={episode.description} className="flex items-center gap-4 p-4">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md">
+                <Image
+                  src={episode.image || "/placeholder.svg"}
+                  alt={episode.title}
+                  fill
+                  className="object-cover"
+                />
               </div>
-            ) : latestEpisodes.length === 0 ? (
-              <div className="flex h-32 items-center justify-center text-muted-foreground">
-                暂无最新剧集
-              </div>
-            ) : (
-              latestEpisodes.map((episode) => (
-                <div key={episode.id} className="flex items-center gap-4 p-4">
-                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md">
-                    <Image
-                      src={episode.image || "/placeholder.svg"}
-                      alt={episode.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <Link href={`/episode/${episode.id}`} className="hover:underline">
-                      <h3 className="font-medium">{episode.title}</h3>
-                    </Link>
-                    <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                      <Link href={`/podcast/${episode.podcast_id}`} className="hover:underline">
-                        {episode.title}
-                      </Link>
-                      <span>•</span>
-                      <span>{Math.floor(episode.duration / 60)}:{String(episode.duration % 60).padStart(2, '0')}</span>
-                      <span>•</span>
-                      <span>{formatDistanceToNow(new Date(episode.datePublishedPretty), { 
-                        addSuffix: true,
-                        locale: zhCN 
-                      })}</span>
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 gap-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <Play className="h-4 w-4" />
-                      <span className="sr-only">播放</span>
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                      <span className="sr-only">更多选项</span>
-                    </Button>
-                  </div>
+              <div className="flex-1 min-w-0">
+                <Link href={`/episode/${episode.id}`} className="hover:underline">
+                  <h3 className="font-medium">{episode.title}</h3>
+                </Link>
+                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                  <Link href={`/episode/${episode.id}`} className="hover:underline">
+                    单集
+                  </Link>
+                  <span>•</span>
+                  <span>{Math.floor(episode.duration / 60)}:{String(episode.duration % 60).padStart(2, '0')}</span>
+                  <span>•</span>
+                  <span>{formatDistanceToNow(new Date(episode.datePublishedPretty), { 
+                    addSuffix: true,
+                    locale: zhCN 
+                  })}</span>
                 </div>
-              ))
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Play className="h-4 w-4" />
+                  <span className="sr-only">播放</span>
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <MoreHorizontal className="h-4 w-4" />
+                  <span className="sr-only">更多选项</span>
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
+        </div>
+        {latestEpisodes.length > 0 && (
+          <div className="flex items-center justify-center p-4">
+            {hasMore ? (
+              <Button 
+                variant="outline" 
+                onClick={loadMore}
+                disabled={loadingEpisodes}
+              >
+                {loadingEpisodes ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    加载中...
+                  </>
+                ) : (
+                  "加载更多"
+                )}
+              </Button>
+            ) : (
+              <p className="text-sm text-muted-foreground">没有更多剧集了</p>
             )}
           </div>
-          {latestEpisodes.length > 0 && (
-            <div className="flex items-center justify-center p-4">
-              <Button variant="outline" asChild>
-                <Link href="/library">加载更多</Link>
-              </Button>
-            </div>
-          )}
+        )}
         </div>
       </div>
 
