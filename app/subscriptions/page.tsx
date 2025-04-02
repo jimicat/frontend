@@ -48,7 +48,8 @@ export default function SubscriptionsPage() {
       )
       .sort((a, b) => {
         if (sortBy === "recent") {
-          return b.id.localeCompare(a.id)
+          // Convert IDs to strings before comparison or use numeric comparison
+          return Number(b.id) - Number(a.id)
         } else if (sortBy === "name") {
           return a.title.localeCompare(b.title)
         } else if (sortBy === "most-episodes") {
@@ -277,7 +278,7 @@ export default function SubscriptionsPage() {
                     <h3 className="text-lg font-bold">{podcast.title}</h3>
                     <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{podcast.description}</p>
                     <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>{podcast.author || 10} 集</span>
+                      <span>{podcast.episodeCount || 10} 集</span>
                       <span>•</span>
                       <span>每周更新</span>
                     </div>
@@ -401,7 +402,7 @@ function SubscriptionsList({ subscriptions, filter, unsubscribing, onUnsubscribe
           <div className="flex gap-4">
             <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg">
               <Image
-                src={podcast.image_url || `/placeholder.svg?height=100&width=100&text=P${podcast.id}`}
+                src={podcast.image || `/placeholder.svg?height=100&width=100&text=P${podcast.id}`}
                 alt={podcast.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -413,11 +414,11 @@ function SubscriptionsList({ subscriptions, filter, unsubscribing, onUnsubscribe
               </Link>
               <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                 <Badge variant="outline" className="text-xs">
-                  {podcast.category}
+                  {podcast.category || "未知"}
                 </Badge>
               </div>
               <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                <span>{podcast.episode_count || 10} 集</span>
+                <span>{podcast.episodeCount || 10} 集</span>
                 {podcast.has_new && (
                   <>
                     <span>•</span>

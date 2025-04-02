@@ -18,6 +18,7 @@ export type User = {
 
 // 播客类型
 export type Podcast = {
+  podcast_id: any
   id: string
   title: string
   description: string

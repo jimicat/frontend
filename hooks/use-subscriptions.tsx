@@ -15,7 +15,7 @@ export function useSubscriptions() {
   // 获取用户订阅
   const fetchSubscriptions = async () => {
     if (!user) {
-      setSubscriptions([]) // Ensure subscriptions is an array
+      setSubscriptions([])
       setIsLoading(false)
       return
     }
@@ -25,16 +25,32 @@ export function useSubscriptions() {
   
     try {
       const response = await api.getSubscriptions()
-  
-      if ( Array.isArray(response.data)) {
-        setSubscriptions(response.data) // Ensure data is an array
+      console.log(response.data)
+      
+      // 定义接口来匹配返回的数据结构
+      interface SubscriptionResponse {
+        subscriptions: Array<{ podcast_id: number }>
+      }
+      
+      // 先将 response.data 转换为 unknown 类型，再转换为 SubscriptionResponse 类型
+      const subscriptionsData = (response.data as unknown) as SubscriptionResponse
+      
+      if (subscriptionsData && subscriptionsData.subscriptions) {
+        // 获取每个播客的详细信息
+        const podcastPromises = subscriptionsData.subscriptions.map(async (sub) => {
+          const podcastResponse = await api.getPodcastDetails(sub.podcast_id.toString())
+          return podcastResponse.success ? podcastResponse.data : null
+        })
 
+        const podcastDetails = await Promise.all(podcastPromises)
+        // 过滤掉可能的 null 值并设置订阅
+        setSubscriptions(podcastDetails.filter((podcast): podcast is Podcast => podcast !== null))
       } else {
-        setSubscriptions([]) // Fallback to an empty array
+        setSubscriptions([])
         setError(response.message || "获取订阅失败")
       }
     } catch (err) {
-      setSubscriptions([]) // Fallback to an empty array on error
+      setSubscriptions([])
       setError("获取订阅时发生错误")
       console.error(err)
     } finally {
@@ -53,7 +69,7 @@ export function useSubscriptions() {
         // 获取播客详情以添加到订阅列表
         const podcastResponse = await api.getPodcastDetails(podcastId)
         if (podcastResponse.success && podcastResponse.data) {
-          setSubscriptions((prev) => [...prev, podcastResponse.data])
+          setSubscriptions((prev) => [...prev, podcastResponse.data as Podcast])
         }
 
         toast({
