@@ -43,6 +43,7 @@ export function PodcastDetails({ podcastId }: { podcastId: string }) {
 
   const [selectedEpisode, setSelectedEpisode] = useState<string | null>(null);
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [episodeData, setEpisodeData] = useState<any>(null);
 
   // 处理订阅/取消订阅
   const handleSubscription = async () => {
@@ -226,7 +227,10 @@ export function PodcastDetails({ podcastId }: { podcastId: string }) {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
-                            onClick={() => setSelectedEpisode(episode.id)}
+                            onClick={() => {
+                              setSelectedEpisode(episode.id);
+                              setEpisodeData(episode);
+                            }}
                           >
                             <Play className="h-4 w-4" />
                             <span className="sr-only">播放</span>
@@ -291,14 +295,7 @@ export function PodcastDetails({ podcastId }: { podcastId: string }) {
       </div>
 
       {/* 音频播放器 */}
-      {selectedEpisode && <AudioPlayer episode={{
-        id: "",
-        title: "",
-        enclosureUrl: "",
-        image: "",
-        podcast: "",
-        duration: 0
-      }} />}
+      {selectedEpisode && <AudioPlayer episode={episodeData} />}
     </div>
   );
 }

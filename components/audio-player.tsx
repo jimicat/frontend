@@ -252,7 +252,7 @@ export function AudioPlayer({ episode }: AudioPlayerProps) {
                 variant="ghost"
                 size="icon"
                 className="h-10 w-10 rounded-full bg-purple-100 text-purple-700 hover:bg-purple-200 hover:text-purple-800 dark:bg-purple-900 dark:text-purple-300 dark:hover:bg-purple-800"
-                onClick={() => setIsPlaying(!isPlaying)}
+                onClick={togglePlay}
               >
                 {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 translate-x-0.5" />}
                 <span className="sr-only">{isPlaying ? "Pause" : "Play"}</span>

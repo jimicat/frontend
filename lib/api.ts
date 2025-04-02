@@ -1,5 +1,5 @@
 // API基础URL
-const API_BASE_URL = "http://127.0.0.1:5000"
+const API_BASE_URL = "https://podapi.ywnote.com"
 
 // 定义API响应类型
 type ApiResponse<T> = {
