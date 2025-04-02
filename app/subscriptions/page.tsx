@@ -29,6 +29,9 @@ import Image from "next/image"
 import Link from "next/link"
 import { useSubscriptions } from "@/hooks/use-subscriptions"
 import { useTrending } from "@/hooks/use-trending"
+import { useLatestEpisodes } from "@/hooks/use-latest-episodes"
+import { formatDistanceToNow } from "date-fns"
+import { zhCN } from "date-fns/locale"
 
 export default function SubscriptionsPage() {
   const { subscriptions, isLoading, error, unsubscribeFromPodcast } = useSubscriptions()
@@ -37,6 +40,7 @@ export default function SubscriptionsPage() {
   const [sortBy, setSortBy] = useState("recent")
   const [activeTab, setActiveTab] = useState("all")
   const [unsubscribing, setUnsubscribing] = useState<string | null>(null)
+  const { latestEpisodes, isLoading: loadingEpisodes } = useLatestEpisodes(subscriptions)
 
   // 搜索和排序订阅
   const filteredSubscriptions = Array.isArray(subscriptions)
@@ -194,60 +198,75 @@ export default function SubscriptionsPage() {
           <Separator />
 
           <div>
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-2xl font-bold">最新剧集</h2>
-              <Button variant="outline" size="sm">
-                查看全部
-              </Button>
-            </div>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-2xl font-bold">最新剧集</h2>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/library">查看全部</Link>
+          </Button>
+        </div>
 
-            <div className="rounded-lg border">
-              <div className="divide-y">
-                {/* 这里应该从API获取最新剧集，目前使用模拟数据 */}
-                {[1, 2, 3, 4, 5].map((episode) => (
-                  <div key={episode} className="flex items-center gap-4 p-4">
-                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md">
-                      <Image
-                        src={`/placeholder.svg?height=100&width=100&text=E${episode}`}
-                        alt={`Episode ${episode}`}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <Link href={`/episode/latest-${episode}`} className="hover:underline">
-                        <h3 className="font-medium">最新剧集 {episode}: 数字时代的创新与挑战</h3>
+        <div className="rounded-lg border">
+          <div className="divide-y">
+            {loadingEpisodes ? (
+              <div className="flex h-32 items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+              </div>
+            ) : latestEpisodes.length === 0 ? (
+              <div className="flex h-32 items-center justify-center text-muted-foreground">
+                暂无最新剧集
+              </div>
+            ) : (
+              latestEpisodes.map((episode) => (
+                <div key={episode.id} className="flex items-center gap-4 p-4">
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md">
+                    <Image
+                      src={episode.image || "/placeholder.svg"}
+                      alt={episode.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <Link href={`/episode/${episode.id}`} className="hover:underline">
+                      <h3 className="font-medium">{episode.title}</h3>
+                    </Link>
+                    <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                      <Link href={`/podcast/${episode.podcast_id}`} className="hover:underline">
+                        {episode.title}
                       </Link>
-                      <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                        <Link href={`/podcast/podcast-${episode}`} className="hover:underline">
-                          播客 {episode}
-                        </Link>
-                        <span>•</span>
-                        <span>
-                          {episode * 10 + 25}:{episode * 5 + 10}
-                        </span>
-                        <span>•</span>
-                        <span>{episode} 天前</span>
-                      </div>
-                    </div>
-                    <div className="flex shrink-0 gap-2">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Play className="h-4 w-4" />
-                        <span className="sr-only">播放</span>
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">更多选项</span>
-                      </Button>
+                      <span>•</span>
+                      <span>{Math.floor(episode.duration / 60)}:{String(episode.duration % 60).padStart(2, '0')}</span>
+                      <span>•</span>
+                      <span>{formatDistanceToNow(new Date(episode.datePublishedPretty), { 
+                        addSuffix: true,
+                        locale: zhCN 
+                      })}</span>
                     </div>
                   </div>
-                ))}
-              </div>
-              <div className="flex items-center justify-center p-4">
-                <Button variant="outline">加载更多</Button>
-              </div>
-            </div>
+                  <div className="flex shrink-0 gap-2">
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Play className="h-4 w-4" />
+                      <span className="sr-only">播放</span>
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreHorizontal className="h-4 w-4" />
+                      <span className="sr-only">更多选项</span>
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
+          {latestEpisodes.length > 0 && (
+            <div className="flex items-center justify-center p-4">
+              <Button variant="outline" asChild>
+                <Link href="/library">加载更多</Link>
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
 
           <Separator />
 

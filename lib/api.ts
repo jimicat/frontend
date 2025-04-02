@@ -38,6 +38,7 @@ export type Episode = {
   audio_url: string
   image: string
   datePublishedPretty: string
+  datePublished: number
   duration: number
   podcast_id: string
 }
