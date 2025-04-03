@@ -1,14 +1,17 @@
 "use client"
 
-import type React from "react"
-
+import { ReactNode } from "react"
 import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 import { api } from "@/lib/api"
 import { Loader2 } from "lucide-react"
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+interface ProtectedRouteProps {
+  children: ReactNode
+}
+
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, isLoading } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
@@ -54,7 +57,8 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     )
   }
 
-  // 用户已登录且令牌有效，渲染子组件
   return <>{children}</>
 }
+
+export default ProtectedRoute
 

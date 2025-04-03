@@ -13,7 +13,54 @@ type ApiResponse<T> = {
 export type User = {
   id: string
   username: string
-  email?: string
+  email: string
+  // 个人资料字段
+  name?: string
+  bio?: string
+  avatar?: string
+  coverImage?: string
+  socialLinks?: {
+    twitter?: string
+    instagram?: string
+    youtube?: string
+    website?: string
+  }
+  stats?: {
+    following: number
+    followers: number
+    episodes: number
+  }
+  interests?: string[]
+  // 播客相关
+  podcasts?: {
+    id: string
+    title: string
+    description: string
+    image: string
+    episodeCount: number
+    followers: number
+    frequency: string
+  }[]
+  // 收听历史
+  listeningHistory?: {
+    id: string
+    title: string
+    description: string
+    image: string
+    duration: string
+    date: string
+    category: string
+    author: string
+    views: number
+    isFavorite: boolean
+  }[]
+  // 关注的用户
+  followingUsers?: {
+    id: string
+    username: string
+    name: string
+    avatar: string
+  }[]
 }
 
 // 播客类型
@@ -235,6 +282,41 @@ class ApiClient {
   // 清除所有通知
   async clearAllNotifications(): Promise<ApiResponse<any>> {
     return this.fetchApi<any>("/api/notifications/clear", "POST")
+  }
+
+  // 获取用户资料
+  async getUserProfile(userId: string): Promise<ApiResponse<any>> {
+    return this.fetchApi<any>(`/api/users/${userId}/profile`)
+  }
+
+  // 更新用户资料
+  async updateUserProfile(userId: string, profileData: any): Promise<ApiResponse<any>> {
+    return this.fetchApi<any>(`/api/users/${userId}/profile`, "PUT", profileData)
+  }
+
+  // 获取用户的播客
+  async getUserPodcasts(userId: string): Promise<ApiResponse<any[]>> {
+    return this.fetchApi<any[]>(`/api/users/${userId}/podcasts`)
+  }
+
+  // 获取用户的关注者
+  async getUserFollowers(userId: string): Promise<ApiResponse<any[]>> {
+    return this.fetchApi<any[]>(`/api/users/${userId}/followers`)
+  }
+
+  // 获取用户正在关注的人
+  async getUserFollowing(userId: string): Promise<ApiResponse<any[]>> {
+    return this.fetchApi<any[]>(`/api/users/${userId}/following`)
+  }
+
+  // 关注用户
+  async followUser(userId: string): Promise<ApiResponse<any>> {
+    return this.fetchApi<any>(`/api/users/${userId}/follow`, "POST")
+  }
+
+  // 取消关注用户
+  async unfollowUser(userId: string): Promise<ApiResponse<any>> {
+    return this.fetchApi<any>(`/api/users/${userId}/unfollow`, "POST")
   }
 }
 

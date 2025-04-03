@@ -32,7 +32,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
 import { useNotifications } from "@/hooks/use-notifications"
-import { ProtectedRoute } from "@/components/protected-route"
+import ProtectedRoute from "@/components/protected-route"
 
 export default function NotificationsPage() {
   return (

@@ -1,10 +1,10 @@
-import type React from "react"
-import { ProtectedRoute } from "@/components/protected-route"
+import type { ReactNode } from "react"
+import ProtectedRoute from "@/components/protected-route"
 
 export default function ProfileLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: ReactNode
 }) {
   return <ProtectedRoute>{children}</ProtectedRoute>
 }

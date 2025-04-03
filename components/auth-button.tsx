@@ -45,8 +45,8 @@ export function AuthButton() {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>
           <div className="flex flex-col">
-            <span>{user.username}</span>
-            <span className="text-xs font-normal text-muted-foreground">{user.email || ""}</span>
+            <span>{user.username || "Demo"}</span>
+            <span className="text-xs font-normal text-muted-foreground">{user.email || "demo@email.com"}</span>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
