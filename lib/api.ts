@@ -286,6 +286,7 @@ class ApiClient {
 
   // 获取用户资料
   async getUserProfile(userId: string): Promise<ApiResponse<any>> {
+    console.log("Fetching user profile for user ID:", userId)
     return this.fetchApi<any>(`/api/users/${userId}/profile`)
   }
 
