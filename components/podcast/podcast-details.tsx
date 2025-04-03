@@ -224,41 +224,44 @@ export function PodcastDetails({ podcastId }: { podcastId: string }) {
                           </p>
                         </div>
                         <div className="flex shrink-0 gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => {
-                            const audioData = {
-                              id: episode.id,
-                              title: episode.title,
-                              enclosureUrl: episode.enclosureUrl,
-                              duration: episode.duration,
-                              image: episode.image || podcast.image,
-                              podcast: podcast.title,
-                              description: episode.description,
-                              author: podcast.author
-                            };
-                            
-                            if (!episode.enclosureUrl) {
-                              console.error('音频文件 URL 不存在');
-                              return;
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => {
+                              if (!episode.enclosureUrl) {
+                                console.error("音频文件 URL 不存在");
+                                return;
+                              }
+
+                              const audioData = {
+                                id: episode.id,
+                                title: episode.title,
+                                enclosureUrl: episode.enclosureUrl,
+                                duration: episode.duration,
+                                image: episode.image || podcast.image,
+                                podcast: podcast.title,
+                                description: episode.description,
+                                author: podcast.author,
+                              };
+
+                              // 如果点击的是当前播放的集数，则切换播放状态
+                              if (selectedEpisode === episode.id) {
+                                setIsPlaying(!isPlaying);
+                              } else {
+                                // 如果点击的是新的集数，设置新的集数并开始播放
+                                setSelectedEpisode(episode.id);
+                                setEpisodeData(audioData);
+                                setIsPlaying(true);
+                              }
+                            }}
+                            aria-pressed={
+                              selectedEpisode === episode.id && isPlaying
                             }
-                            
-                            // 如果点击的是当前正在播放的剧集，则切换播放状态
-                            if (selectedEpisode === episode.id) {
-                              setIsPlaying(!isPlaying);
-                            } else {
-                              // 如果是新的剧集，则设置新的剧集并开始播放
-                              setSelectedEpisode(episode.id);
-                              setEpisodeData(audioData);
-                              setIsPlaying(true);
-                            }
-                          }}
-                        >
-                          <Play className="h-4 w-4" />
-                          <span className="sr-only">播放</span>
-                        </Button>
+                          >
+                            <Play className="h-4 w-4" />
+                            <span className="sr-only">播放</span>
+                          </Button>
                         </div>
                       </div>
                     ))
@@ -317,11 +320,11 @@ export function PodcastDetails({ podcastId }: { podcastId: string }) {
           </Tabs>
         </div>
       </div>
-      
+
       {selectedEpisode && episodeData && (
         <div className="fixed bottom-0 left-0 right-0 z-50">
-          <AudioPlayer 
-            episode={episodeData} 
+          <AudioPlayer
+            episode={episodeData}
             isPlaying={isPlaying}
             onPlayingChange={setIsPlaying} // 添加回调函数
           />

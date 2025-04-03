@@ -168,6 +168,27 @@ export function AudioPlayer({ episode, isPlaying: externalIsPlaying, onPlayingCh
         src={episode.enclosureUrl}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
+        onError={(e) => {
+          // 处理音频加载错误
+          console.error("音频加载错误:", e);
+          // 如果是重定向导致的错误，可以尝试使用新的 URL
+          if (audioRef.current) {
+            const currentSrc = audioRef.current.currentSrc;
+            if (currentSrc && currentSrc !== episode.enclosureUrl) {
+              audioRef.current.src = currentSrc;
+              audioRef.current.load();
+              if (internalIsPlaying) {
+                audioRef.current.play();
+              }
+            }
+          }
+        }}
+        onCanPlay={() => {
+          // 音频可以播放时，如果当前状态是播放，则开始播放
+          if (internalIsPlaying) {
+            audioRef.current?.play();
+          }
+        }}
         onEnded={() => {
           setInternalIsPlaying(false);
           onPlayingChange?.(false);
