@@ -4,7 +4,12 @@ const API_BASE_URL = "http://127.0.0.1:5000"
 // 定义API响应类型
 type ApiResponse<T> = {
   success: boolean
-  data?: T
+  data?: {
+    data: T
+    message?: string
+    sucess: boolean
+    token?: string
+  }
   message?: string
   token?: string
 }
@@ -152,6 +157,7 @@ class ApiClient {
 
       // 如果响应包含token，保存它
       if (data.token) {
+        console.log("打印TOKEN:", data.token)
         this.setToken(data.token)
       }
 

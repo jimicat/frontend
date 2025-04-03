@@ -57,8 +57,8 @@ export function useProfile() {
         const response = await api.getUserProfile(user.id)
         console.log("用户资料:", response)
 
-        if (response.success && response.data) {
-          setProfile(response.data)
+        if (response.success && response.data?.data) {
+          setProfile(response.data.data)
         } else {
           setError(response.message || "无法获取用户资料")
           // 如果API调用失败，至少使用基本用户信息
@@ -67,8 +67,8 @@ export function useProfile() {
 
         // 获取用户的播客
         const podcastsResponse = await api.getUserPodcasts(user.id)
-        if (podcastsResponse.success && podcastsResponse.data) {
-          setUserPodcasts(podcastsResponse.data)
+        if (podcastsResponse.success && podcastsResponse.data?.data) {
+          setUserPodcasts(podcastsResponse.data.data)
         }
       } catch (err) {
         console.error("获取用户资料错误:", err)
@@ -92,7 +92,7 @@ export function useProfile() {
       const response = await api.updateUserProfile(user.id, updatedProfile)
 
       if (response.success && response.data) {
-        setProfile((prev) => (prev ? { ...prev, ...response.data } : response.data))
+        setProfile((prev) => (prev ? { ...prev, ...response.data?.data } : response.data))
         toast({
           title: "资料已更新",
           description: "您的个人资料已成功更新。",

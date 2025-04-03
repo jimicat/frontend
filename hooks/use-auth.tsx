@@ -48,10 +48,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setError(null)
     try {
       const response = await api.login(username, password)
-      console.log("Login response:", response)
+      console.log("打印登录函数:", response)
 
-      if (response.success && response.data) {
-        const userData = response.data
+      if (response.success && response.data?.data) {
+        const userData = response.data.data
         setUser(userData)
 
         // 保存用户信息到本地存储
@@ -73,8 +73,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await api.register(username, email, password)
 
-      if (response.success && response.data) {
-        const userData = response.data
+      if (response.success && response.data?.data) {
+        const userData = response.data.data
         setUser(userData)
 
         // 保存用户信息到本地存储

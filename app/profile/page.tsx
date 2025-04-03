@@ -23,6 +23,12 @@ import ProtectedRoute from "@/components/protected-route"
 function ProfilePage() {
   const { profile, userPodcasts, isLoading, isUpdating, updateProfile } = useProfile()
   const { user } = useAuth()
+  
+  // 添加调试日志
+  useEffect(() => {
+    console.log("当前用户信息:", user)
+    console.log("个人资料信息:", profile)
+  }, [user, profile])
   const router = useRouter()
   const { toast } = useToast()
   const [listeningHistory, setListeningHistory] = useState<any[]>([])
@@ -47,7 +53,7 @@ function ProfilePage() {
         const response = await api.getListeningHistory()
         if (response.success && response.data) {
           // 只获取最近的2条记录
-          setListeningHistory(response.data.slice(0, 2))
+          setListeningHistory(response.data?.data?.slice(0, 2) || [])
         }
       } catch (err) {
         console.error("获取收听历史错误:", err)
@@ -107,6 +113,24 @@ function ProfilePage() {
       })
     }
   }
+
+  // 添加个人资料获取逻辑
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return
+      
+      try {
+        const response = await api.getUserProfile(user.id)
+        if (response.success && response.data) {
+          updateProfile(response.data.data)
+        }
+      } catch (err) {
+        console.error("获取个人资料错误:", err)
+      }
+    }
+  
+    fetchProfile()
+  }, [user])
 
   if (!user && !isLoading) {
     return null // 重定向处理，不需要渲染内容
