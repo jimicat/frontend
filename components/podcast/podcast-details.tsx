@@ -13,6 +13,7 @@ import { AudioPlayer } from "@/components/audio-player";
 import {
   Headphones,
   Play,
+  Pause,
   Clock,
   Calendar,
   User,
@@ -255,12 +256,16 @@ export function PodcastDetails({ podcastId }: { podcastId: string }) {
                                 setIsPlaying(true);
                               }
                             }}
-                            aria-pressed={
-                              selectedEpisode === episode.id && isPlaying
-                            }
+                            aria-pressed={selectedEpisode === episode.id && isPlaying}
                           >
-                            <Play className="h-4 w-4" />
-                            <span className="sr-only">播放</span>
+                            {selectedEpisode === episode.id && isPlaying ? (
+                              <Pause className="h-4 w-4" />
+                            ) : (
+                              <Play className="h-4 w-4" />
+                            )}
+                            <span className="sr-only">
+                              {selectedEpisode === episode.id && isPlaying ? "暂停" : "播放"}
+                            </span>
                           </Button>
                         </div>
                       </div>
