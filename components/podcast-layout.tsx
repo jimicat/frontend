@@ -4,21 +4,8 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import {
-  Bell,
-  BookMarked,
-  Home,
-  Menu,
-  Search,
-  Settings,
-  User,
-  Headphones,
-  Mic,
-  TrendingUp,
-  Clock,
-  X,
-} from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
+import { Bell, BookMarked, Home, Menu, Search, Settings, User, Headphones, Mic, TrendingUp, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -27,13 +14,16 @@ import { cn } from "@/lib/utils"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { AuthButton } from "@/components/auth-button"
 import { useAuth } from "@/hooks/use-auth"
+import { SearchDialog } from "@/components/search/search-dialog"
 
 export function PodcastLayout({ children }: { children: React.ReactNode }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [notifications, setNotifications] = useState(3)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
   const { user, logout } = useAuth()
 
   useEffect(() => {
@@ -49,6 +39,15 @@ export function PodcastLayout({ children }: { children: React.ReactNode }) {
     if (path === "/" && pathname === "/") return true
     if (path !== "/" && pathname.startsWith(path)) return true
     return false
+  }
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+      setIsSearchOpen(false)
+      setSearchQuery("")
+    }
   }
 
   return (
@@ -77,13 +76,15 @@ export function PodcastLayout({ children }: { children: React.ReactNode }) {
                   <ThemeToggle />
                 </div>
                 <div className="my-4">
-                  <Input
-                    type="search"
-                    placeholder="Search episodes..."
-                    className="w-full"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
+                  <form onSubmit={handleSearch}>
+                    <Input
+                      type="search"
+                      placeholder="Search episodes..."
+                      className="w-full"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </form>
                 </div>
                 <nav className="grid gap-2 text-lg font-medium">
                   <Link
@@ -195,35 +196,16 @@ export function PodcastLayout({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
           <div className="flex items-center gap-2">
-            {isSearchOpen ? (
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search episodes..."
-                  className="w-full rounded-full bg-background pl-8 md:w-[300px] lg:w-[400px]"
-                  autoFocus
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1 h-7 w-7 rounded-full"
-                  onClick={() => {
-                    setIsSearchOpen(false)
-                    setSearchQuery("")
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ) : (
-              <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setIsSearchOpen(true)}>
-                <Search className="h-5 w-5" />
-                <span className="sr-only">Search</span>
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              onClick={() => setIsSearchDialogOpen(true)}
+              aria-label="Search"
+            >
+              <Search className="h-5 w-5" />
+              <span className="sr-only">Search</span>
+            </Button>
 
             {user && (
               <Link href="/notifications">
@@ -409,6 +391,9 @@ export function PodcastLayout({ children }: { children: React.ReactNode }) {
         </aside>
         <main className="flex-1 pb-20">{children}</main>
       </div>
+
+      {/* 搜索对话框 */}
+      <SearchDialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen} />
     </div>
   )
 }

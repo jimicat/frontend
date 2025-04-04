@@ -9,6 +9,17 @@ type ApiResponse<T> = {
   token?: string
 }
 
+// Add Creator type
+export type Creator = {
+  id: string
+  username: string
+  name?: string
+  avatar?: string
+  bio?: string
+  followers?: number
+  podcasts?: number
+}
+
 // 用户类型
 export type User = {
   [x: string]: any
@@ -216,8 +227,18 @@ class ApiClient {
 
   // 搜索播客
   async searchPodcasts(query: string): Promise<ApiResponse<Podcast[]>> {
-    return this.fetchApi<Podcast[]>(`/api/search?q=${encodeURIComponent(query)}`, "GET", undefined, false)
+    return this.fetchApi<Podcast[]>(`/api/search?query=${encodeURIComponent(query)}`, "GET", undefined, false)
   }
+
+  // Add search episodes method
+  // async searchEpisodes(query: string): Promise<ApiResponse<Episode[]>> {
+  //   return this.fetchApi<Episode[]>(`/api/episodes/search?q=${encodeURIComponent(query)}`, "GET", undefined, false)
+  // }
+
+  // // Add search creators method
+  // async searchCreators(query: string): Promise<ApiResponse<Creator[]>> {
+  //   return this.fetchApi<Creator[]>(`/api/creators/search?q=${encodeURIComponent(query)}`, "GET", undefined, false)
+  // }
 
   // 登出（客户端）
   logout(): void {
