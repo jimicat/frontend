@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast"
 export type UserProfile = User & {
   bio?: string
   coverImage?: string
-  avatarImage?: string
+  avatar?: string
   socialLinks?: {
     twitter?: string
     instagram?: string

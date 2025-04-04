@@ -293,16 +293,26 @@ class ApiClient {
 
   // 更新用户资料
   async updateUserProfile(userId: string, profileData: any): Promise<ApiResponse<any>> {
-    // 确保 avatar 是 URL 字符串
-    if (profileData.avatar && typeof profileData.avatar === 'string') {
-      console.log("Avatar URL:", profileData.avatar)
-    // 保持原有的请求结构
-    return this.fetchApi<any>(`/api/users/${userId}/profile`, "PUT", {
-    ...profileData,
-    avatar: profileData.avatar // 确保 avatar URL 被正确传递
-    })
+    try {
+      const response = await this.fetchApi<any>(`/api/users/${userId}/profile`, "PUT", profileData)
+      
+      // 正确处理返回的用户数据
+      if (response.success && response.data?.user) {
+        return {
+          success: true,
+          data: response.data.user,
+          message: response.message
+        }
+      }
+      
+      return response
+    } catch (error) {
+      console.error("更新用户资料错误:", error)
+      return {
+        success: false,
+        message: "更新用户资料失败"
+      }
     }
-    return this.fetchApi<any>(`/api/users/${userId}/profile`, "PUT", profileData)
   }
 
   // 获取用户的播客
