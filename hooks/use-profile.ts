@@ -54,7 +54,7 @@ export function useProfile() {
 
       try {
         setIsLoading(true)
-        const response = await api.getUserProfile(user.id)
+        const response = await api.getUserProfile(user.data.id)
         console.log("用户资料:", response)
 
         if (response.success && response.data) {
@@ -89,7 +89,19 @@ export function useProfile() {
 
     try {
       setIsUpdating(true)
-      const response = await api.updateUserProfile(user.id, updatedProfile)
+      // 确保从正确的位置获取用户ID
+      const userId = user.data?.id
+      
+      if (!userId) {
+        toast({
+          title: "更新失败",
+          description: "无法获取用户ID",
+          variant: "destructive",
+        })
+        return false
+      }
+
+      const response = await api.updateUserProfile(userId, updatedProfile)
 
       if (response.success && response.data) {
         setProfile((prev) => (prev ? { ...prev, ...response.data } : response.data))

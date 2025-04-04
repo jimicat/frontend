@@ -11,6 +11,7 @@ type ApiResponse<T> = {
 
 // 用户类型
 export type User = {
+  [x: string]: any
   id: string
   username: string
   email: string
@@ -292,6 +293,15 @@ class ApiClient {
 
   // 更新用户资料
   async updateUserProfile(userId: string, profileData: any): Promise<ApiResponse<any>> {
+    // 确保 avatar 是 URL 字符串
+    if (profileData.avatar && typeof profileData.avatar === 'string') {
+      console.log("Avatar URL:", profileData.avatar)
+    // 保持原有的请求结构
+    return this.fetchApi<any>(`/api/users/${userId}/profile`, "PUT", {
+    ...profileData,
+    avatar: profileData.avatar // 确保 avatar URL 被正确传递
+    })
+    }
     return this.fetchApi<any>(`/api/users/${userId}/profile`, "PUT", profileData)
   }
 
